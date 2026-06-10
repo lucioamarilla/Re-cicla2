@@ -1,6 +1,8 @@
 ### Estructura del proyecto
 
 ecopuntos-inteligentes-mvp/
+
+
 │
 ├── README.md                          # Descripción general del proyecto, cómo ejecutar cada componente
 ├── .gitignore                         # Ignorar archivos de entorno, builds, cachés
