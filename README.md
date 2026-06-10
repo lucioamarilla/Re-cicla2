@@ -1,83 +1,54 @@
-### Estructura del proyecto
+# EcoPuntos Inteligentes - MVP 
 
+Bienvenido al repositorio del MVP de **EcoPuntos Inteligentes**, un sistema integral diseñado para clasificar residuos mediante Inteligencia Artificial y recompensar a los usuarios con puntos canjeables a través de una aplicación móvil.
+
+## Descripción del Proyecto
+
+Este proyecto es un Producto Mínimo Viable (MVP) que integra hardware de captura (cámara), modelos de IA locales para la clasificación de residuos (plástico, cartón, rechazo), un backend robusto para el motor transaccional y una aplicación móvil nativa para la gestión de los usuarios.
+
+## Arquitectura y Módulos
+
+El proyecto está dividido en cuatro componentes principales:
+
+1. **Backend (`/backend`)**: Desarrollado en **Python con FastAPI**. Actúa como el núcleo del sistema, gestionando usuarios, transacciones, saldos de puntos y sirviendo de puente para la inferencia de la IA.
+2. **Cliente PC (`/pc-client`)**: Una interfaz web minimalista servida con **Flask** que utiliza **OpenCV** para capturar imágenes desde una cámara local y enviarlas al backend.
+3. **Aplicación Móvil (`/mobile-app`)**: App nativa en **Kotlin** (Android) donde los usuarios pueden generar sus códigos de sesión, revisar su historial de transacciones y canjear sus EcoPuntos.
+4. **Modelo de IA (`/ia-model`)**: Contiene el modelo de Deep Learning (basado en MobileNet/TensorFlow Lite) encargado de clasificar el material reciclable.
+
+---
+
+## Estructura del Repositorio
+
+```text
 ecopuntos-inteligentes-mvp/
-
-
-│
-├── README.md                          # Descripción general del proyecto, cómo ejecutar cada componente
-├── .gitignore                         # Ignorar archivos de entorno, builds, cachés
-│
-├── docs/                              # Documentación del equipo
-│   ├── requerimientos.md              # RF y RNF
-│   ├── mvp-plan.md                    # Plan de iteraciones y cronograma del día 1
+├── docs/                              # Documentación técnica y de gestión del equipo
+│   ├── requerimientos.md              # Requisitos Funcionales y No Funcionales
+│   ├── mvp-plan.md                    # Plan de iteraciones y cronograma del Día 1
 │   ├── demo-script.md                 # Guión para la demostración final
-│   └── manual-tecnico.md              # Instrucciones de instalación para cada rol
-│
-├── backend/                           # FastAPI - Backend principal
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── main.py                    # Creación de la app FastAPI, montado de routers
-│   │   ├── database.py                # Configuración de SQLAlchemy y conexión a DB (SQLite/PostgreSQL)
-│   │   ├── models.py                  # Tablas: Usuario, Transaccion
-│   │   ├── schemas.py                 # Pydantic models para requests/responses
-│   │   ├── routers/
-│   │   │   ├── usuarios.py            # POST /registro, GET /saldo, GET /transacciones
-│   │   │   ├── validar.py             # POST /validar/codigo
-│   │   │   ├── clasificar.py          # POST /clasificar (recibe imagen, llama a IA)
-│   │   │   └── canje.py               # POST /canje
-│   │   ├── services/
-│   │   │   ├── ia_service.py          # Carga el modelo, clasifica imagen
-│   │   │   └── puntos_service.py      # Lógica de asignación de puntos y transacciones
-│   │   └── utils/
-│   │       └── codigo_generator.py    # Generación de códigos únicos de 4 dígitos
-│   ├── requirements.txt               # fastapi, uvicorn, sqlalchemy, tensorflow-cpu, python-multipart, etc.
-│   ├── .env.example                   # Variables de entorno (DB_URL, SECRET_KEY)
-│   └── run.py                         # Script para iniciar el servidor (uvicorn)
-│
-├── pc-client/                         # Script Python para la PC con cámara (interfaz web local)
-│   ├── app.py                         # Servidor Flask que sirve la interfaz y maneja cámara
-│   ├── camera.py                      # Funciones de captura con OpenCV
-│   ├── static/
-│   │   ├── index.html                 # Interfaz web minimalista (campo código, botón tomar foto, área mensajes)
-│   │   ├── style.css                  # Estilos básicos
-│   │   └── script.js                  # Llamadas a Flask (AJAX) y actualización de UI
-│   ├── requirements.txt               # flask, opencv-python, requests, python-dotenv
-│   ├── .env.example                   # BACKEND_URL (ej. http://localhost:8000)
-│   └── README.md                      # Instrucciones para correr el cliente
-│
-├── mobile-app/                        # Kotlin (Android nativo)
-│   ├── app/
-│   │   ├── src/
-│   │   │   ├── main/
-│   │   │   │   ├── java/com/example/ecopuntos/
-│   │   │   │   │   ├── MainActivity.kt           # Pantalla principal (código + saldo)
-│   │   │   │   │   ├── HistoryActivity.kt        # Historial
-│   │   │   │   │   ├── RedeemActivity.kt         # Canje
-│   │   │   │   │   ├── network/
-│   │   │   │   │   │   ├── ApiService.kt         # Interface Retrofit
-│   │   │   │   │   │   ├── RetrofitClient.kt    # Configuración de Retrofit
-│   │   │   │   │   │   └── Models.kt            # Data classes
-│   │   │   │   │   ├── data/
-│   │   │   │   │   │   └── SharedPrefsManager.kt
-│   │   │   │   │   └── utils/
-│   │   │   │   │       └── Constants.kt
-│   │   │   │   └── res/                          # layouts, values, drawable
-│   │   │   └── test/ y androidTest/
-│   │   ├── build.gradle (app level)
-│   │   └── proguard-rules.pro
-│   ├── build.gradle (project level)
-│   ├── settings.gradle
-│   ├── gradle.properties
-│   ├── local.properties.example       # ruta del SDK (opcional)
-│   └── README.md                      # Instrucciones para abrir en Android Studio
-│
-├── ia-model/                          # Modelos preentrenados
-│   ├── model.tflite                   # MobileNet adaptado (o modelo en otro formato)
-│   ├── labels.txt                     # plastic, carton, rechazo
-│   ├── training/                      # (opcional) scripts de fine-tuning
-│   │   └── train_model.py
-│   └── README.md                      # Origen del modelo, cómo reemplazarlo
-│
-└── scripts/                           # Utilidades comunes (opcional)
-    ├── setup_db.py                    # Crear tablas en la base de datos
-    └── seed_data.py                   # Datos de prueba (opcional)
+│   └── manual-tecnico.md              # Instrucciones detalladas de instalación por rol
+├── backend/                           # API Principal (FastAPI)
+│   ├── app/                           # Código fuente de la API (routers, schemas, models)
+│   ├── services/                      # Lógica de negocio (IA, sistema de puntos)
+│   ├── requirements.txt               # Dependencias del backend
+│   ├── .env.example                   # Plantilla de variables de entorno
+│   └── run.py                         # Script de inicio (Uvicorn)
+├── pc-client/                         # Cliente local con cámara (Flask + OpenCV)
+│   ├── app.py                         # Servidor Flask e interfaz web
+│   ├── camera.py                      # Módulo de captura de video
+│   ├── static/                        # Archivos estáticos (HTML, CSS, JS)
+│   ├── requirements.txt               # Dependencias del cliente
+│   ├── .env.example                   # Plantilla de variables de entorno (URL del backend)
+│   └── README.md                      # Instrucciones específicas del cliente PC
+├── mobile-app/                        # Aplicación Android Nativa (Kotlin)
+│   ├── app/src/main/java/...          # Código fuente (Activities, Retrofit API)
+│   ├── build.gradle                   # Configuración de Gradle
+│   └── README.md                      # Instrucciones para Android Studio
+├── ia-model/                          # Modelos de Machine Learning
+│   ├── model.tflite                   # Modelo preentrenado exportado
+│   ├── labels.txt                     # Etiquetas de clasificación
+│   └── training/                      # Scripts opcionales para fine-tuning
+├── scripts/                           # Utilidades de desarrollo
+│   ├── setup_db.py                    # Script para inicializar tablas
+│   └── seed_data.py                   # Script para poblar datos de prueba
+├── .gitignore                         # Archivos ignorados por Git
+└── README.md                          # Este archivo
