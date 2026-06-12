@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>EcoPuntos - Validar código</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #1e5a3a 0%, #0e3a22 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 48px;
+            padding: 2rem 2rem 2.5rem;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 {
+            color: #1e5a3a;
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .sub {
+            color: #2c6e49;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        .codigo-input {
+            margin: 1.5rem 0;
+        }
+        input {
+            font-size: 3rem !important;
+            text-align: center;
+            letter-spacing: 8px;
+            width: 100%;
+            max-width: 250px;
+            padding: 0.5rem;
+            border: 3px solid #ccc;
+            border-radius: 24px;
+            font-family: monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus {
+            border-color: #1e5a3a;
+            box-shadow: 0 0 0 3px rgba(30,90,58,0.3);
+        }
+        button {
+            background-color: #1e5a3a;
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            padding: 12px 24px;
+            border-radius: 60px;
+            margin: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s ease;
+        }
+        button:active { transform: scale(0.97); }
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-foto {
+            background-color: #0284c7;
+            margin-top: 1.2rem;
+            font-size: 1.3rem;
+            padding: 12px 32px;
+        }
+        .mensaje {
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 40px;
+        }
+        .valido {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .invalido {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #1e5a3a;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .nombre-usuario {
+            font-size: 1.1rem;
+            background: #e6f7ec;
+            border-radius: 40px;
+            padding: 6px 12px;
+            display: inline-block;
+        }
+        footer {
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: #5b6e5f;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>♻️ EcoPuntos</h1>
+    <div class="sub">Estación de reciclaje inteligente</div>
+
+    <div class="codigo-input">
+        <input type="text" id="codigo" maxlength="4" autofocus placeholder="CÓDIGO" autocomplete="off" style="text-transform: uppercase;">
+    </div>
+    <div>
+        <button id="btnValidar">🔍 Validar</button>
+    </div>
+
+    <div id="mensajeArea" style="min-height: 100px;"></div>
+
+    <div>
+        <button id="btnTomarFoto" disabled class="btn-foto">📸 Tomar foto</button>
+    </div>
+    <footer>Ingresa el código de 4 letras que aparece en tu app móvil</footer>
+</div>
+
+<script>
+    // Elementos del DOM
+    const inputCodigo = document.getElementById('codigo');
+    const btnValidar = document.getElementById('btnValidar');
+    const btnTomarFoto = document.getElementById('btnTomarFoto');
+    const mensajeArea = document.getElementById('mensajeArea');
+
+    let validacionActiva = false; // para evitar múltiples peticiones
+
+    // Convertir a mayúsculas automático y limitar longitud
+    inputCodigo.addEventListener('input', function(e) {
+        this.value = this.value.toUpperCase().slice(0,4);
+    });
+
+    // Enviar con Enter
+    inputCodigo.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!validacionActiva) validarCodigo();
+        }
+    });
+
+    btnValidar.addEventListener('click', () => {
+        if (!validacionActiva) validarCodigo();
+    });
+
+    async function validarCodigo() {
+        let codigo = inputCodigo.value.trim();
+        if (codigo.length !== 4) {
+            mostrarMensaje("⚠️ Ingresa exactamente 4 caracteres", "invalido");
+            return;
+        }
+
+        validacionActiva = true;
+        mostrarMensaje('<div class="spinner"></div> Validando...', "", true);
+
+        try {
+            const response = await fetch('/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigo: codigo })
+            });
+            const data = await response.json();
+
+            if (data.valido) {
+                // Código válido
+                mostrarMensaje(`✅ <strong>Código válido</strong><br>👤 Usuario: ${data.nombre || codigo}`, "valido");
+                btnTomarFoto.disabled = false;
+                // Opcional: guardar código en localStorage o variable para la foto
+                sessionStorage.setItem('codigoValidado', codigo);
+            } else {
+                // Código inválido
+                mostrarMensaje("❌ Código inválido", "invalido");
+                btnTomarFoto.disabled = true;
+                // Limpiar input a los 2s
+                setTimeout(() => {
+                    inputCodigo.value = '';
+                    inputCodigo.focus();
+                    // Limpiar mensaje después de 2s (opcional)
+                    if (mensajeArea.innerText.includes("inválido")) {
+                        mensajeArea.innerHTML = '';
+                    }
+                }, 2000);
+            }
+        } catch (error) {
+            console.error("Error validando:", error);
+            mostrarMensaje("⚠️ Error de conexión con el servidor", "invalido");
+            btnTomarFoto.disabled = true;
+        } finally {
+            validacionActiva = false;
+        }
+    }
+
+    function mostrarMensaje(html, clase, esSpinner = false) {
+        mensajeArea.innerHTML = `<div class="mensaje ${clase}">${html}</div>`;
+        if (!esSpinner) {
+            // Si no es spinner, reiniciar después de cierto tiempo si es válido? no es necesario.
+        }
+    }
+
+    // El botón tomar foto por ahora solo muestra un placeholder (próximo issue)
+    btnTomarFoto.addEventListener('click', () => {
+        alert("Funcionalidad de captura y clasificación próxima (RF-04 / RF-05)");
+        // Aquí luego integraremos cámara y IA
+    });
+</script>
+</body>
+</html>
