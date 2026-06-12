@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>EcoPuntos - Validar código</title>
+    <title>EcoPuntos - Estación de reciclaje</title>
     <style>
         * {
             box-sizing: border-box;
@@ -22,7 +22,7 @@
             background: white;
             border-radius: 48px;
             padding: 2rem 2rem 2.5rem;
-            max-width: 500px;
+            max-width: 550px;
             width: 100%;
             box-shadow: 0 20px 35px rgba(0,0,0,0.3);
             text-align: center;
@@ -112,12 +112,22 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        .nombre-usuario {
-            font-size: 1.1rem;
-            background: #e6f7ec;
-            border-radius: 40px;
-            padding: 6px 12px;
-            display: inline-block;
+        #previewContainer {
+            margin-top: 1.5rem;
+            padding: 10px;
+            background: #f3f4f6;
+            border-radius: 20px;
+            display: none;
+        }
+        #previewImage {
+            max-width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .info {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            color: #4b5563;
         }
         footer {
             margin-top: 2rem;
@@ -132,7 +142,7 @@
     <div class="sub">Estación de reciclaje inteligente</div>
 
     <div class="codigo-input">
-        <input type="text" id="codigo" maxlength="4" autofocus placeholder="CÓDIGO" autocomplete="off" style="text-transform: uppercase;">
+        <input type="text" id="codigoInput" maxlength="4" autofocus placeholder="CÓDIGO" autocomplete="off">
     </div>
     <div>
         <button id="btnValidar">🔍 Validar</button>
@@ -141,96 +151,163 @@
     <div id="mensajeArea" style="min-height: 100px;"></div>
 
     <div>
-        <button id="btnTomarFoto" disabled class="btn-foto">📸 Tomar foto</button>
+        <!-- 🔧 MODO DEBUG: botón siempre habilitado (sin disabled) -->
+        <!-- 🔐 MODO NORMAL: para habilitar la validación, cambiar el botón a: disabled -->
+        <button id="btnTomarFoto" class="btn-foto">📸 Tomar foto</button>
     </div>
+
+    <div id="previewContainer">
+        <img id="previewImage" alt="Vista previa">
+        <div class="info" id="previewInfo"></div>
+    </div>
+
     <footer>Ingresa el código de 4 letras que aparece en tu app móvil</footer>
 </div>
 
 <script>
-    // Elementos del DOM
-    const inputCodigo = document.getElementById('codigo');
+    // Elementos DOM
+    const inputCodigo = document.getElementById('codigoInput');
     const btnValidar = document.getElementById('btnValidar');
     const btnTomarFoto = document.getElementById('btnTomarFoto');
     const mensajeArea = document.getElementById('mensajeArea');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const previewInfo = document.getElementById('previewInfo');
 
-    let validacionActiva = false; // para evitar múltiples peticiones
+    let validacionActiva = false;
 
-    // Convertir a mayúsculas automático y limitar longitud
+    // ----- Conversión a mayúsculas y limitación de longitud (siempre útil) -----
     inputCodigo.addEventListener('input', function(e) {
         this.value = this.value.toUpperCase().slice(0,4);
     });
 
-    // Enviar con Enter
+    // ----- Envío con Enter (solo si la validación está habilitada) -----
     inputCodigo.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
+            // 🔧 MODO DEBUG: comentar la siguiente línea si queremos saltar la validación
             if (!validacionActiva) validarCodigo();
         }
     });
 
     btnValidar.addEventListener('click', () => {
+        // 🔧 MODO DEBUG: comentar esta línea si queremos saltar la validación
         if (!validacionActiva) validarCodigo();
     });
 
+    // ------------------------------------------------------------------
+    //  MODO NORMAL (validación con Firebase) - COMENTADO PARA DEBUG
+    //  Para volver al flujo normal:
+    //   1. Descomentar todo el bloque de la función validarCodigo() de abajo
+    //   2. Comentar el bloque "MODO DEBUG (simulación)"
+    //   3. En el HTML, agregar 'disabled' al botón btnTomarFoto
+    //   4. En el evento del botón Tomar foto, descomentar la verificación de sessionStorage
+    // ------------------------------------------------------------------
+
+    /* ----- BLOQUE NORMAL (VALIDACIÓN REAL) - INICIO -----
     async function validarCodigo() {
         let codigo = inputCodigo.value.trim();
         if (codigo.length !== 4) {
             mostrarMensaje("⚠️ Ingresa exactamente 4 caracteres", "invalido");
             return;
         }
-
         validacionActiva = true;
         mostrarMensaje('<div class="spinner"></div> Validando...', "", true);
-
         try {
+            console.log("Validando:", codigo);
             const response = await fetch('/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ codigo: codigo })
             });
             const data = await response.json();
-
             if (data.valido) {
-                // Código válido
-                mostrarMensaje(`✅ <strong>Código válido</strong><br>👤 Usuario: ${data.nombre || codigo}`, "valido");
+                mostrarMensaje(`✅ Código válido - Usuario: ${data.nombre}`, "valido");
                 btnTomarFoto.disabled = false;
-                // Opcional: guardar código en localStorage o variable para la foto
                 sessionStorage.setItem('codigoValidado', codigo);
+                previewContainer.style.display = 'none';
             } else {
-                // Código inválido
                 mostrarMensaje("❌ Código inválido", "invalido");
                 btnTomarFoto.disabled = true;
-                // Limpiar input a los 2s
+                sessionStorage.removeItem('codigoValidado');
                 setTimeout(() => {
                     inputCodigo.value = '';
                     inputCodigo.focus();
-                    // Limpiar mensaje después de 2s (opcional)
-                    if (mensajeArea.innerText.includes("inválido")) {
-                        mensajeArea.innerHTML = '';
-                    }
+                    if (mensajeArea.innerText.includes("inválido")) mensajeArea.innerHTML = '';
                 }, 2000);
             }
         } catch (error) {
-            console.error("Error validando:", error);
-            mostrarMensaje("⚠️ Error de conexión con el servidor", "invalido");
+            console.error(error);
+            mostrarMensaje("⚠️ Error de conexión", "invalido");
             btnTomarFoto.disabled = true;
         } finally {
             validacionActiva = false;
         }
     }
+    ----- BLOQUE NORMAL (VALIDACIÓN REAL) - FIN ----- */
+
+    // ----- MODO DEBUG (simula validación exitosa automática) - INICIO -----
+    async function validarCodigo() {
+        // En modo debug, cualquier código de 4 caracteres se considera válido.
+        let codigo = inputCodigo.value.trim();
+        if (codigo.length !== 4) {
+            mostrarMensaje("⚠️ Ingresa exactamente 4 caracteres", "invalido");
+            return;
+        }
+        validacionActiva = true;
+        mostrarMensaje('<div class="spinner"></div> Validando...', "", true);
+        // Simulamos una respuesta exitosa después de 1 segundo
+        setTimeout(() => {
+            mostrarMensaje(`✅ [DEBUG] Código ${codigo} aceptado (simulación)`, "valido");
+            btnTomarFoto.disabled = false;
+            sessionStorage.setItem('codigoValidado', codigo);
+            previewContainer.style.display = 'none';
+            validacionActiva = false;
+        }, 1000);
+    }
+    // ----- MODO DEBUG - FIN -----
 
     function mostrarMensaje(html, clase, esSpinner = false) {
         mensajeArea.innerHTML = `<div class="mensaje ${clase}">${html}</div>`;
-        if (!esSpinner) {
-            // Si no es spinner, reiniciar después de cierto tiempo si es válido? no es necesario.
-        }
     }
 
-    // El botón tomar foto por ahora solo muestra un placeholder (próximo issue)
-    btnTomarFoto.addEventListener('click', () => {
-        alert("Funcionalidad de captura y clasificación próxima (RF-04 / RF-05)");
-        // Aquí luego integraremos cámara y IA
+    // ----- Captura de foto (siempre activa en modo debug) -----
+    btnTomarFoto.addEventListener('click', async () => {
+        // 🔧 MODO NORMAL: descomentar las siguientes líneas para requerir validación
+        // const codigo = sessionStorage.getItem('codigoValidado');
+        // if (!codigo) {
+        //     alert("Primero valida un código");
+        //     return;
+        // }
+
+        btnTomarFoto.disabled = true;
+        btnTomarFoto.textContent = '📸 Capturando...';
+
+        try {
+            console.log("Solicitando captura...");
+            const response = await fetch('/capturar', { method: 'POST' });
+            const data = await response.json();
+            console.log("Respuesta captura:", data);
+
+            if (data.success) {
+                previewImage.src = `data:image/jpeg;base64,${data.image}`;
+                previewInfo.textContent = `Resolución: ${data.width} x ${data.height} px`;
+                previewContainer.style.display = 'block';
+            } else {
+                alert(`Error: ${data.error}`);
+                previewContainer.style.display = 'none';
+            }
+        } catch (error) {
+            console.error("Error al capturar:", error);
+            alert('Error de conexión con el servidor');
+            previewContainer.style.display = 'none';
+        } finally {
+            btnTomarFoto.disabled = false;
+            btnTomarFoto.textContent = '📸 Tomar foto';
+        }
     });
+
+    console.log("✅ Modo DEBUG activo - La validación es simulada, el botón de foto está siempre habilitado.");
 </script>
 </body>
 </html>
