@@ -10,10 +10,13 @@ load_dotenv()
 app = Flask(__name__)
 
 # ------------------ Inicializar Firebase Admin SDK ------------------
-firebase_key_path = os.getenv("FIRESTORE_KEY_PATH", "serviceAccountKey.json")
-if not os.path.exists(firebase_key_path):
-    raise FileNotFoundError(f"No se encontró el archivo de credenciales: {firebase_key_path}")
+# Reemplaza estas líneas:
+# firebase_key_path = os.getenv("FIRESTORE_KEY_PATH", "serviceAccountKey.json")
 
+
+firebase_key_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+if not firebase_key_path:
+    raise Exception("Variable de entorno GOOGLE_APPLICATION_CREDENTIALS no configurada")
 cred = credentials.Certificate(firebase_key_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
