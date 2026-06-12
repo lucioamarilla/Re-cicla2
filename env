@@ -1,0 +1,17 @@
+ROBOFLOW_MODEL=residuos-reciclaje
+ROBOFLOW_VERSION=1
+ROBOFLOW_API_KEY=rf_dLov0S6Xmih2cMJIAzoDcUuDRi62
+
+# Ruta al JSON del service account de Firebase
+FIREBASE_CREDENTIALS=firebase_credentials.json
+
+# Puntos por material detectado
+PUNTOS_PLASTICO=1
+PUNTOS_CARTON=1
+PUNTOS_RECHAZO=0
+
+# Umbral de confianza minimo para aceptar la prediccion
+CONFIDENCE_THRESHOLD=0.5
+
+# Puerto del servidor Flask
+PORT=5000

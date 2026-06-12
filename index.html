@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Re-cicla | Estación</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      color: #fff;
+    }
+    .card {
+      background: #ffffff;
+      color: #1b1b1b;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+    h1 { margin-top: 0; color: #2e7d32; }
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 24px;
+      text-align: center;
+      letter-spacing: 8px;
+      border: 2px solid #2e7d32;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: #2e7d32;
+      color: #fff;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background 0.2s;
+    }
+    button:hover { background: #1b5e20; }
+    button:disabled { background: #9e9e9e; cursor: not-allowed; }
+    #resultado {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      min-height: 40px;
+      font-weight: bold;
+    }
+    .ok { background: #e8f5e9; color: #2e7d32; }
+    .error { background: #ffebee; color: #c62828; }
+    .hidden { display: none; }
+    .material-plastico { color: #1976d2; }
+    .material-carton { color: #8d6e63; }
+    .material-rechazo { color: #757575; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>♻ Re-cicla</h1>
+
+    <div id="paso-codigo">
+      <p>Ingresá tu código de 4 dígitos</p>
+      <input type="text" id="codigo" maxlength="4" placeholder="0000" inputmode="numeric">
+      <button onclick="validarCodigo()">Validar</button>
+    </div>
+
+    <div id="paso-deposito" class="hidden">
+      <p>Listo, depositá tu residuo frente a la cámara</p>
+      <button id="btnFoto" onclick="clasificar()">📷 Tomar foto</button>
+      <button onclick="reiniciar()">Cambiar código</button>
+    </div>
+
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    let codigoActual = null;
+
+    async function validarCodigo() {
+      const codigo = document.getElementById('codigo').value.trim();
+      const resultadoDiv = document.getElementById('resultado');
+
+      if (codigo.length !== 4 || !/^\d{4}$/.test(codigo)) {
+        mostrarResultado('Código inválido. Debe ser de 4 dígitos.', 'error');
+        return;
+      }
+
+      try {
+        const resp = await fetch('/api/validar_codigo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok || !data.valido) {
+          mostrarResultado(data.error || 'Código no encontrado', 'error');
+          return;
+        }
+
+        codigoActual = codigo;
+        document.getElementById('paso-codigo').classList.add('hidden');
+        document.getElementById('paso-deposito').classList.remove('hidden');
+        mostrarResultado(`Código válido. Saldo actual: ${data.puntos} pts`, 'ok');
+      } catch (e) {
+        mostrarResultado('Error de conexión con el servidor', 'error');
+      }
+    }
+
+    async function clasificar() {
+      const btn = document.getElementById('btnFoto');
+      btn.disabled = true;
+      btn.textContent = 'Procesando...';
+
+      try {
+        const resp = await fetch('/api/clasificar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo: codigoActual })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          mostrarResultado(data.error || 'Error al clasificar', 'error');
+        } else {
+          const claseClass = `material-${data.material}`;
+          mostrarResultado(
+            `Detectado: <span class="${claseClass}">${data.material.toUpperCase()}</span>
+             (confianza ${(data.confianza * 100).toFixed(1)}%)<br>
+             +${data.puntosGanados} pts → Nuevo saldo: ${data.nuevoSaldo} pts`,
+            'ok'
+          );
+        }
+      } catch (e) {
+        mostrarResultado('Error de conexión con el servidor', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📷 Tomar foto';
+      }
+    }
+
+    function reiniciar() {
+      codigoActual = null;
+      document.getElementById('codigo').value = '';
+      document.getElementById('paso-deposito').classList.add('hidden');
+      document.getElementById('paso-codigo').classList.remove('hidden');
+      document.getElementById('resultado').innerHTML = '';
+    }
+
+    function mostrarResultado(mensaje, tipo) {
+      const div = document.getElementById('resultado');
+      div.innerHTML = mensaje;
+      div.className = tipo;
+    }
+  </script>
+</body>
+</html>
