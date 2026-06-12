@@ -2,13 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoPuntos - Estación de reciclaje</title>
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
-        }
+        * { box-sizing: border-box; font-family: system-ui; }
         body {
             background: linear-gradient(145deg, #1e5a3a 0%, #0e3a22 100%);
             min-height: 100vh;
@@ -17,31 +14,20 @@
             align-items: center;
             margin: 0;
             padding: 20px;
+            transition: background 0.3s;
         }
         .card {
             background: white;
             border-radius: 48px;
-            padding: 2rem 2rem 2.5rem;
+            padding: 2rem;
             max-width: 550px;
             width: 100%;
-            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
             text-align: center;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
         }
-        h1 {
-            color: #1e5a3a;
-            margin-top: 0;
-            font-size: 2rem;
-        }
-        .sub {
-            color: #2c6e49;
-            margin-bottom: 2rem;
-            font-weight: 500;
-        }
-        .codigo-input {
-            margin: 1.5rem 0;
-        }
+        h1 { color: #1e5a3a; }
         input {
-            font-size: 3rem !important;
+            font-size: 3rem;
             text-align: center;
             letter-spacing: 8px;
             width: 100%;
@@ -49,15 +35,8 @@
             padding: 0.5rem;
             border: 3px solid #ccc;
             border-radius: 24px;
-            font-family: monospace;
-            font-weight: bold;
             text-transform: uppercase;
-            outline: none;
-            transition: 0.2s;
-        }
-        input:focus {
-            border-color: #1e5a3a;
-            box-shadow: 0 0 0 3px rgba(30,90,58,0.3);
+            font-family: monospace;
         }
         button {
             background-color: #1e5a3a;
@@ -68,35 +47,16 @@
             border-radius: 60px;
             margin: 8px;
             cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.1s ease;
         }
-        button:active { transform: scale(0.97); }
-        button:disabled {
-            background-color: #aaa;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-foto {
-            background-color: #0284c7;
-            margin-top: 1.2rem;
-            font-size: 1.3rem;
-            padding: 12px 32px;
-        }
-        .mensaje {
+        button:disabled { background-color: #aaa; cursor: not-allowed; }
+        .btn-foto { background-color: #0284c7; }
+        .mensaje-area {
             margin-top: 1.5rem;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             padding: 10px;
             border-radius: 40px;
-        }
-        .valido {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        .invalido {
-            background-color: #fee2e2;
-            color: #991b1b;
+            min-height: 80px;
         }
         .spinner {
             display: inline-block;
@@ -109,30 +69,55 @@
             vertical-align: middle;
             margin-right: 8px;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         #previewContainer {
             margin-top: 1.5rem;
-            padding: 10px;
             background: #f3f4f6;
             border-radius: 20px;
+            padding: 10px;
             display: none;
         }
-        #previewImage {
-            max-width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        #previewImage { max-width: 100%; border-radius: 16px; }
+        footer { margin-top: 2rem; font-size: 0.75rem; color: #5b6e5f; }
+
+        /* Botones debug */
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
         }
-        .info {
+        .debug-left {
+            left: 20px;
+        }
+        .debug-right {
+            right: 20px;
+        }
+        .debug-btn {
+            background-color: #f97316;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
             font-size: 0.8rem;
-            margin-top: 0.5rem;
-            color: #4b5563;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: background 0.2s;
         }
-        footer {
-            margin-top: 2rem;
-            font-size: 0.75rem;
-            color: #5b6e5f;
+        .debug-btn:hover { background-color: #ea580c; }
+        .mock-success {
+            background-color: #22c55e;
+        }
+        .mock-success:hover {
+            background-color: #16a34a;
+        }
+        .mock-reject {
+            background-color: #ef4444;
+        }
+        .mock-reject:hover {
+            background-color: #dc2626;
         }
     </style>
 </head>
@@ -141,80 +126,86 @@
     <h1>♻️ EcoPuntos</h1>
     <div class="sub">Estación de reciclaje inteligente</div>
 
-    <div class="codigo-input">
-        <input type="text" id="codigoInput" maxlength="4" autofocus placeholder="CÓDIGO" autocomplete="off">
+    <div>
+        <input type="text" id="codigoInput" maxlength="4" autofocus placeholder="CÓDIGO">
     </div>
     <div>
         <button id="btnValidar">🔍 Validar</button>
     </div>
 
-    <div id="mensajeArea" style="min-height: 100px;"></div>
+    <div id="mensajeArea" class="mensaje-area"></div>
 
     <div>
-        <!-- 🔧 MODO DEBUG: botón siempre habilitado (sin disabled) -->
-        <!-- 🔐 MODO NORMAL: para habilitar la validación, cambiar el botón a: disabled -->
-        <button id="btnTomarFoto" class="btn-foto">📸 Tomar foto</button>
+        <button id="btnTomarFoto" class="btn-foto" disabled>📸 Tomar foto</button>
     </div>
 
     <div id="previewContainer">
         <img id="previewImage" alt="Vista previa">
-        <div class="info" id="previewInfo"></div>
+        <div id="previewInfo" style="font-size:0.8rem; margin-top:0.5rem;"></div>
     </div>
+    <footer>Ingresa código o usa debug (abajo)</footer>
+</div>
 
-    <footer>Ingresa el código de 4 letras que aparece en tu app móvil</footer>
+<!-- Panel debug izquierdo: validación -->
+<div class="debug-panel debug-left">
+    <button id="debugValidacionBtn" class="debug-btn">🐞 Debug: Validar sin backend</button>
+</div>
+
+<!-- Panel debug derecho: simulación de Roboflow -->
+<div class="debug-panel debug-right">
+    <button id="mockExitoBtn" class="debug-btn mock-success">✅ Mock: Plástico (éxito)</button>
+    <button id="mockRechazoBtn" class="debug-btn mock-reject">❌ Mock: Rechazo o baja confianza</button>
 </div>
 
 <script>
-    // Elementos DOM
+    // Elementos
     const inputCodigo = document.getElementById('codigoInput');
     const btnValidar = document.getElementById('btnValidar');
     const btnTomarFoto = document.getElementById('btnTomarFoto');
-    const mensajeArea = document.getElementById('mensajeArea');
+    const mensajeDiv = document.getElementById('mensajeArea');
     const previewContainer = document.getElementById('previewContainer');
     const previewImage = document.getElementById('previewImage');
     const previewInfo = document.getElementById('previewInfo');
 
-    let validacionActiva = false;
+    const debugValidacionBtn = document.getElementById('debugValidacionBtn');
+    const mockExitoBtn = document.getElementById('mockExitoBtn');
+    const mockRechazoBtn = document.getElementById('mockRechazoBtn');
 
-    // ----- Conversión a mayúsculas y limitación de longitud (siempre útil) -----
-    inputCodigo.addEventListener('input', function(e) {
-        this.value = this.value.toUpperCase().slice(0,4);
-    });
+    let usuarioActual = { id: null, nombre: null };
+    let ultimaImagenBase64 = null;
+    let validando = false;
 
-    // ----- Envío con Enter (solo si la validación está habilitada) -----
-    inputCodigo.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            // 🔧 MODO DEBUG: comentar la siguiente línea si queremos saltar la validación
-            if (!validacionActiva) validarCodigo();
-        }
-    });
+    function mostrarMensaje(texto) {
+        mensajeDiv.innerHTML = texto;
+        console.log(`[MENSAJE] ${texto}`);
+    }
 
-    btnValidar.addEventListener('click', () => {
-        // 🔧 MODO DEBUG: comentar esta línea si queremos saltar la validación
-        if (!validacionActiva) validarCodigo();
-    });
+    function mostrarSpinner(texto) {
+        mensajeDiv.innerHTML = `<div class="spinner"></div> ${texto}`;
+    }
 
-    // ------------------------------------------------------------------
-    //  MODO NORMAL (validación con Firebase) - COMENTADO PARA DEBUG
-    //  Para volver al flujo normal:
-    //   1. Descomentar todo el bloque de la función validarCodigo() de abajo
-    //   2. Comentar el bloque "MODO DEBUG (simulación)"
-    //   3. En el HTML, agregar 'disabled' al botón btnTomarFoto
-    //   4. En el evento del botón Tomar foto, descomentar la verificación de sessionStorage
-    // ------------------------------------------------------------------
+    // ----- Modo debug: activa sesión sin backend -----
+    function activarDebugValidacion() {
+        const codigoDebug = "DBUG";
+        usuarioActual = { id: codigoDebug, nombre: "Modo Debug" };
+        mostrarMensaje(`🐞 DEBUG: Sesión iniciada con código ${codigoDebug}. Puedes tomar fotos.`);
+        btnTomarFoto.disabled = false;
+        previewContainer.style.display = 'none';
+        ultimaImagenBase64 = null;
+        inputCodigo.value = codigoDebug;
+    }
 
-    /* ----- BLOQUE NORMAL (VALIDACIÓN REAL) - INICIO -----
+    // ----- Validación normal -----
     async function validarCodigo() {
-        let codigo = inputCodigo.value.trim();
+        if (validando) return;
+        const codigo = inputCodigo.value.trim().toUpperCase();
         if (codigo.length !== 4) {
-            mostrarMensaje("⚠️ Ingresa exactamente 4 caracteres", "invalido");
+            mostrarMensaje("⚠️ Ingresa exactamente 4 caracteres");
             return;
         }
-        validacionActiva = true;
-        mostrarMensaje('<div class="spinner"></div> Validando...', "", true);
+        validando = true;
+        mostrarSpinner("Validando código...");
         try {
-            console.log("Validando:", codigo);
             const response = await fetch('/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -222,92 +213,125 @@
             });
             const data = await response.json();
             if (data.valido) {
-                mostrarMensaje(`✅ Código válido - Usuario: ${data.nombre}`, "valido");
+                usuarioActual = { id: codigo, nombre: data.nombre };
+                mostrarMensaje(`✅ Código válido. Bienvenido ${data.nombre}. Presiona "Tomar foto"`);
                 btnTomarFoto.disabled = false;
-                sessionStorage.setItem('codigoValidado', codigo);
                 previewContainer.style.display = 'none';
+                ultimaImagenBase64 = null;
             } else {
-                mostrarMensaje("❌ Código inválido", "invalido");
+                mostrarMensaje("❌ Código inválido");
                 btnTomarFoto.disabled = true;
-                sessionStorage.removeItem('codigoValidado');
                 setTimeout(() => {
                     inputCodigo.value = '';
                     inputCodigo.focus();
-                    if (mensajeArea.innerText.includes("inválido")) mensajeArea.innerHTML = '';
+                    mostrarMensaje("Ingrese su código de 4 dígitos");
                 }, 2000);
             }
         } catch (error) {
             console.error(error);
-            mostrarMensaje("⚠️ Error de conexión", "invalido");
+            mostrarMensaje("⚠️ Error de conexión con el servidor");
             btnTomarFoto.disabled = true;
         } finally {
-            validacionActiva = false;
+            validando = false;
         }
     }
-    ----- BLOQUE NORMAL (VALIDACIÓN REAL) - FIN ----- */
 
-    // ----- MODO DEBUG (simula validación exitosa automática) - INICIO -----
-    async function validarCodigo() {
-        // En modo debug, cualquier código de 4 caracteres se considera válido.
-        let codigo = inputCodigo.value.trim();
-        if (codigo.length !== 4) {
-            mostrarMensaje("⚠️ Ingresa exactamente 4 caracteres", "invalido");
+    // ----- Captura de foto (real) -----
+    async function capturarFoto() {
+        if (!usuarioActual.id) {
+            mostrarMensaje("Primero valida un código o usa debug");
             return;
         }
-        validacionActiva = true;
-        mostrarMensaje('<div class="spinner"></div> Validando...', "", true);
-        // Simulamos una respuesta exitosa después de 1 segundo
-        setTimeout(() => {
-            mostrarMensaje(`✅ [DEBUG] Código ${codigo} aceptado (simulación)`, "valido");
-            btnTomarFoto.disabled = false;
-            sessionStorage.setItem('codigoValidado', codigo);
-            previewContainer.style.display = 'none';
-            validacionActiva = false;
-        }, 1000);
-    }
-    // ----- MODO DEBUG - FIN -----
-
-    function mostrarMensaje(html, clase, esSpinner = false) {
-        mensajeArea.innerHTML = `<div class="mensaje ${clase}">${html}</div>`;
-    }
-
-    // ----- Captura de foto (siempre activa en modo debug) -----
-    btnTomarFoto.addEventListener('click', async () => {
-        // 🔧 MODO NORMAL: descomentar las siguientes líneas para requerir validación
-        // const codigo = sessionStorage.getItem('codigoValidado');
-        // if (!codigo) {
-        //     alert("Primero valida un código");
-        //     return;
-        // }
-
         btnTomarFoto.disabled = true;
-        btnTomarFoto.textContent = '📸 Capturando...';
-
+        btnTomarFoto.textContent = "📸 Capturando...";
+        mostrarSpinner("Capturando imagen...");
         try {
-            console.log("Solicitando captura...");
             const response = await fetch('/capturar', { method: 'POST' });
             const data = await response.json();
-            console.log("Respuesta captura:", data);
-
             if (data.success) {
                 previewImage.src = `data:image/jpeg;base64,${data.image}`;
-                previewInfo.textContent = `Resolución: ${data.width} x ${data.height} px`;
+                previewInfo.textContent = `Resolución: ${data.width}x${data.height}`;
                 previewContainer.style.display = 'block';
+                ultimaImagenBase64 = data.image;
+                // No llamamos a clasificar automáticamente, dejamos que el usuario decida (mock o real)
+                mostrarMensaje("Imagen capturada. Usa los botones de simulación de Roboflow (abajo derecha) o espera clasificación real (no implementada automáticamente).");
+                btnTomarFoto.disabled = false;
             } else {
-                alert(`Error: ${data.error}`);
-                previewContainer.style.display = 'none';
+                mostrarMensaje(`Error de cámara: ${data.error}`);
+                btnTomarFoto.disabled = false;
             }
         } catch (error) {
-            console.error("Error al capturar:", error);
-            alert('Error de conexión con el servidor');
-            previewContainer.style.display = 'none';
-        } finally {
+            console.error(error);
+            mostrarMensaje("Error al capturar imagen");
             btnTomarFoto.disabled = false;
-            btnTomarFoto.textContent = '📸 Tomar foto';
+        } finally {
+            btnTomarFoto.textContent = "📸 Tomar foto";
         }
-    });
+    }
 
-    console.log("✅ Modo DEBUG activo - La validación es simulada, el botón de foto está siempre habilitado.");
+    // ----- Simulación de clasificación (mock) -----
+    function simularClasificacion(material, confidence, puntos, mensajePersonalizado = null) {
+        if (!ultimaImagenBase64) {
+            mostrarMensaje("⚠️ Primero captura una foto usando el botón 'Tomar foto'");
+            return;
+        }
+        // Mostrar resultado simulado
+        if (puntos === 1) {
+            mostrarMensaje(`✅ ${mensajePersonalizado || `Aprobado +1 punto | Material: ${material} (${Math.round(confidence*100)}%)`}`);
+            // Cambiar fondo temporal (opcional, solo visual)
+            document.body.style.transition = 'background 0.3s';
+            document.body.style.backgroundColor = '#22c55e';
+            setTimeout(() => document.body.style.backgroundColor = '', 2000);
+        } else {
+            let razon = material === 'rechazo' ? 'Material no reciclable' : `Confianza baja (${Math.round(confidence*100)}%)`;
+            mostrarMensaje(`❌ ${mensajePersonalizado || `Rechazado — 0 puntos | ${razon}`}`);
+            document.body.style.backgroundColor = '#ef4444';
+            setTimeout(() => document.body.style.backgroundColor = '', 2000);
+        }
+        // Limpiar preview después de unos segundos
+        setTimeout(() => {
+            if (usuarioActual.id) {
+                mostrarMensaje(`Código válido. Puedes tomar otra foto.`);
+                previewContainer.style.display = 'none';
+                ultimaImagenBase64 = null;
+                btnTomarFoto.disabled = false;
+            } else {
+                mostrarMensaje("Sesión no válida");
+                btnTomarFoto.disabled = true;
+            }
+        }, 3000);
+    }
+
+    // Mocks predefinidos
+    function mockExito() {
+        simularClasificacion("plastico", 0.95, 1, "Mock: Plástico con 95% de confianza → +1 punto");
+    }
+
+    function mockRechazo() {
+        // Puede ser rechazo o baja confianza
+        const opciones = [
+            { material: "rechazo", confidence: 0.92, puntos: 0, msg: "Mock: Rechazo (material no reciclable) → 0 puntos" },
+            { material: "plastico", confidence: 0.45, puntos: 0, msg: "Mock: Plástico con baja confianza (45%) → 0 puntos" }
+        ];
+        const elegido = opciones[Math.floor(Math.random() * opciones.length)];
+        simularClasificacion(elegido.material, elegido.confidence, elegido.puntos, elegido.msg);
+    }
+
+    // ----- Eventos -----
+    inputCodigo.addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase().slice(0,4);
+    });
+    inputCodigo.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') validarCodigo();
+    });
+    btnValidar.addEventListener('click', validarCodigo);
+    btnTomarFoto.addEventListener('click', capturarFoto);
+    debugValidacionBtn.addEventListener('click', activarDebugValidacion);
+    mockExitoBtn.addEventListener('click', mockExito);
+    mockRechazoBtn.addEventListener('click', mockRechazo);
+
+    mostrarMensaje("Ingrese código o use debug. Capture foto y luego use los botones de simulación Roboflow.");
+    console.log("✅ Página con simulación de Roboflow lista");
 </script>
 </body>
 </html>
