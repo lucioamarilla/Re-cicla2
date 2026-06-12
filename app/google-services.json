@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "593104803620",
+    "project_id": "re-cicla2-3246e",
+    "storage_bucket": "re-cicla2-3246e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:593104803620:android:064b279578f8c3ffcd45b1",
+        "android_client_info": {
+          "package_name": "com.hackaton.re_cicla2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "593104803620-a3msbb19biaf98hsd1jv6n9mjn2nab3q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hackaton.re_cicla2",
+            "certificate_hash": "9a854c7e12b2fb65609cd49504e995cc3026f3ee"
+          }
+        },
+        {
+          "client_id": "593104803620-2kmac7ofanlr7lp6r7a9fs3tcm8bs97e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3qpd-5z3FjXC3f0u-Pgo04wCk7yWEvUw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "593104803620-00p2o46a644bdq1ntsqoagtdkrlvigb6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:593104803620:android:b56f11a17dcd6957cd45b1",
+        "android_client_info": {
+          "package_name": "com.recicla2.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "593104803620-2kmac7ofanlr7lp6r7a9fs3tcm8bs97e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3qpd-5z3FjXC3f0u-Pgo04wCk7yWEvUw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "593104803620-00p2o46a644bdq1ntsqoagtdkrlvigb6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
