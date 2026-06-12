@@ -1,0 +1,289 @@
+:root {
+    --color-idle: #1b5e20;
+    --color-validando: #f9a825;
+    --color-listo: #2e7d32;
+    --color-analizando: #e65100;
+    --color-aprobado: #00c853;
+    --color-rechazado: #d50000;
+    --color-error: #bf360c;
+    --color-card-bg: #ffffff;
+    --color-text: #1b1b1b;
+    --radius-card: 48px;
+    --radius-btn: 60px;
+    --radius-input: 24px;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    transition: background-color 0.4s ease, background 0.4s ease;
+}
+
+.estado-idle {
+    background: linear-gradient(145deg, #1b5e20 0%, #2e7d32 100%);
+}
+
+.estado-validando {
+    background: linear-gradient(145deg, #f9a825 0%, #f57f17 100%);
+}
+
+.estado-listo {
+    background: linear-gradient(145deg, #1b5e20 0%, #388e3c 100%);
+}
+
+.estado-analizando {
+    background: linear-gradient(145deg, #e65100 0%, #bf360c 100%);
+}
+
+.estado-resultado-aprobado {
+    background: #00c853;
+}
+
+.estado-resultado-rechazado {
+    background: #d50000;
+}
+
+.estado-error {
+    background: #bf360c;
+}
+
+.card {
+    background: var(--color-card-bg);
+    border-radius: var(--radius-card);
+    padding: 2rem;
+    max-width: 550px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+h1 {
+    color: #1e5a3a;
+    margin-top: 0;
+    font-size: 2rem;
+}
+
+.sub {
+    color: #5b6e5f;
+    margin-bottom: 1.5rem;
+}
+
+input#uidInput {
+    font-size: 1.2rem;
+    text-align: center;
+    width: 100%;
+    max-width: 380px;
+    padding: 0.75rem;
+    border: 3px solid #ccc;
+    border-radius: var(--radius-input);
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input#uidInput:focus {
+    border-color: #1e5a3a;
+}
+
+button {
+    background-color: #1e5a3a;
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    padding: 12px 24px;
+    border-radius: var(--radius-btn);
+    margin: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+button:hover {
+    transform: scale(1.02);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-foto {
+    background-color: #0284c7;
+}
+
+.btn-foto:hover {
+    background-color: #0369a1;
+}
+
+#videoContainer {
+    margin-top: 1rem;
+    background: #f3f4f6;
+    border-radius: 20px;
+    padding: 10px;
+    display: none;
+}
+
+#videoFeed {
+    max-width: 100%;
+    border-radius: 16px;
+    width: 100%;
+}
+
+#previewContainer {
+    margin-top: 1rem;
+    background: #f3f4f6;
+    border-radius: 20px;
+    padding: 10px;
+    display: none;
+}
+
+#previewImage {
+    max-width: 100%;
+    border-radius: 16px;
+}
+
+#previewInfo {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    color: #666;
+}
+
+#mensajeArea {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 40px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+#resultadoPantalla {
+    display: none;
+    padding: 20px;
+    border-radius: var(--radius-card);
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    animation: fadeIn 0.3s ease;
+}
+
+.resultado-exito {
+    background: rgba(0, 200, 83, 0.15);
+    color: #00c853;
+}
+
+.resultado-rechazo {
+    background: rgba(213, 0, 0, 0.15);
+    color: #d50000;
+}
+
+.resultado-error {
+    background: rgba(191, 54, 12, 0.15);
+    color: #bf360c;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #1e5a3a;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+footer {
+    margin-top: 2rem;
+    font-size: 0.75rem;
+    color: #5b6e5f;
+}
+
+/* Debug buttons */
+.debug-panel {
+    position: fixed;
+    bottom: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.debug-left {
+    left: 20px;
+}
+
+.debug-right {
+    right: 20px;
+}
+
+.debug-btn {
+    background-color: #f97316;
+    color: white;
+    border: none;
+    border-radius: 40px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.2s;
+}
+
+.debug-btn:hover {
+    background-color: #ea580c;
+}
+
+.mock-success {
+    background-color: #22c55e;
+}
+
+.mock-success:hover {
+    background-color: #16a34a;
+}
+
+.mock-reject {
+    background-color: #ef4444;
+}
+
+.mock-reject:hover {
+    background-color: #dc2626;
+}
+
+.hidden {
+    display: none !important;
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPuntos - Estacion de reciclaje</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+<div class="card">
+    <h1>EcoPuntos</h1>
+    <div class="sub">Estacion de reciclaje inteligente</div>
+
+    <div>
+        <input type="text" id="uidInput" autofocus placeholder="UID de Firebase">
+    </div>
+    <div>
+        <button id="btnValidar">Validar</button>
+    </div>
+
+    <div id="videoContainer">
+        <img id="videoFeed" src="/video_feed" alt="Camara en vivo">
+    </div>
+
+    <div>
+        <button id="btnTomarFoto" class="btn-foto" disabled>Tomar foto</button>
+    </div>
+
+    <div id="previewContainer">
+        <img id="previewImage" alt="Vista previa">
+        <div id="previewInfo"></div>
+    </div>
+
+    <div id="mensajeArea">Ingrese su UID de Firebase</div>
+
+    <div id="resultadoPantalla"></div>
+
+    <footer>Ingresa tu UID o usa los botones de debug (abajo)</footer>
+</div>
+
+<div class="debug-panel debug-left">
+    <button id="debugValidacionBtn" class="debug-btn">Debug: Validar sin backend</button>
+</div>
+
+<div class="debug-panel debug-right">
+    <button id="mockExitoBtn" class="debug-btn mock-success">Mock: Plastico (exito)</button>
+    <button id="mockRechazoBtn" class="debug-btn mock-reject">Mock: Rechazo</button>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
